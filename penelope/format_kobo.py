@@ -26,6 +26,8 @@ import os
 import subprocess
 import zipfile
 
+from penelope import utilities
+
 from penelope.prefix_kobo import get_prefix as get_prefix_kobo
 from penelope.utilities import create_temp_directory
 from penelope.utilities import create_temp_file
@@ -141,11 +143,17 @@ def write(dictionary, args, output_file_path):
     # sort by headword
     dictionary.sort(by_headword=True)
 
+    transform_headword_function = utilities.load_transform_headword(args.transform_headword)
+
+    def combined_prefix_kobo(headword, length):
+        headword = transform_headword_function(headword)
+        return get_prefix_kobo(headword, length)
+
     # group by prefix
     files_to_compress = []
     prefix_length = int(args.group_by_prefix_length)
     special_group, group_keys, group_dict = dictionary.group(
-        prefix_function=get_prefix_kobo,
+        prefix_function=combined_prefix_kobo,
         prefix_length=prefix_length,
         merge_min_size=int(args.group_by_prefix_merge_min_size),
         merge_across_first=args.group_by_prefix_merge_across_first
@@ -154,6 +162,7 @@ def write(dictionary, args, output_file_path):
         special_group_key = u"1" * prefix_length
         group_dict[special_group_key] = special_group
         group_keys = [special_group_key] + group_keys
+
 
     # write files
     for key in group_keys:
@@ -164,7 +173,7 @@ def write(dictionary, args, output_file_path):
         for entry in group_dict[key]:
             headword = entry.headword
             definition = entry.definition
-            file_html_obj.write((u"<w><a name=\"%s\"/><div><b>%s</b><br/>%s</div></w>" % (headword, headword, definition)).encode("utf-8"))
+            file_html_obj.write((u"<w><a name=\"%s\"/><div><b>%s</b><br/>%s</div></w>" % (transform_headword_function(headword), headword, definition)).encode("utf-8"))
         file_html_obj.write((u"</html>").encode("utf-8"))
         file_html_obj.close()
 
@@ -184,7 +193,8 @@ def write(dictionary, args, output_file_path):
 
     # write words
     file_words_path = WORDS_FILE_NAME
-    keys = sorted(dictionary.entries_index.keys())
+
+    keys = sorted(map(transform_headword_function, dictionary.entries_index.keys()))
     try:
         import marisa_trie
         trie = marisa_trie.Trie(keys)

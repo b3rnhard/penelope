@@ -229,6 +229,8 @@ optional arguments:
   --sort-by-headword    sort by headword (default: False)
   --sort-ignore-case    ignore case when sorting (default: False)
   --sort-reverse        reverse the sort order (default: False)
+  --transform-headword  use the specified transform function for all headwords. 
+                        Only implemented for the kobo output.
 
 examples:
 
@@ -270,6 +272,11 @@ examples:
 
   $ penelope -i dict.xml -j xml -f en -t it -p mobi -o output.epub --epub-output-definitions
     As above, but also output definitions
+
+  $ penelope -i dictcc-en-de.csv -j csv -f en -t de -p kobo -o the-dict --csv-fs \t --transform-headword path-to-penelope\penelope\dictcc.py
+    Will create a dictionary in Kobo format with a downloaded dict.cc (which is tab separated) it will 
+	transform tagged headwords in the non-tagged counterpart, i. e. it will remove [Coll.] and similar 
+	constructs from the search index, unlike the search result which will contain the tagged version.
 ```
 
 You can find ISO 639-1 language codes [here](http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).

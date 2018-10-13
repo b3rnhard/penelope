@@ -270,6 +270,12 @@ COMMAND_LINE_PARAMETERS = [
     },
     {
         "short": None,
+        "long": "--transform-headword",
+        "help": "use the specified transform function for all headwords. Only implemented for the kobo output.",
+        "action": "store"
+    },
+    {
+        "short": None,
         "long": "--kindlegen-path",
         "help": "path to kindlegen executable",
         "action": "store"
@@ -510,6 +516,7 @@ def set_default_values(args):
     set_default_value("sort_by_headword", False)
     set_default_value("sort_ignore_case", False)
     set_default_value("sort_reverse", False)
+    set_default_value("transform_headword", None)
     set_default_value("version", False)
     set_default_value("author", u"Penelope")
     set_default_value("copyright", u"GNU GPL v3")

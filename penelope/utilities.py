@@ -65,6 +65,25 @@ def load_input_parser(parser_file_path):
     return parser
 
 
+def load_transform_headword(transform_headword_path):
+    transform_headword = lambda headword: headword
+    if transform_headword_path is not None:
+        if os.path.exists(transform_headword_path):
+            try:
+                # load source file
+                transform_headword = imp.load_source("", transform_headword_path)
+                try:
+                    # try calling parse function
+                    transform_headword.transform_headword(None)
+                except:
+                    print_error("Error trying to call the transform_headword() function. Does file '%s' contain a transform_headword() function?" % transform_headword_path)
+            except:
+                print_error("Error trying to load transform_headword from file '%s'" % transform_headword_path)
+        else:
+            print_error("File '%s' does not exist" % transform_headword_path)
+    return lambda headword: transform_headword.transform_headword(headword)
+
+
 def create_temp_file():
     tmp_handler, tmp_path = tempfile.mkstemp()
     return (tmp_handler, tmp_path)
