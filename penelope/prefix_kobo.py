@@ -47,9 +47,8 @@ def get_prefix(headword, length):
             # for headwords shorter than length, append an 'a' at the end
             # e.g. length=3, "xy" => "xya"
             headword += u"a"
-        # TODO maybe the check should be done only for the first character
         is_ok = True
-        for character in headword:
+        for character in headword[0:length]:
             if not is_allowed(character):
                 is_ok = False
                 break
